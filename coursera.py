@@ -3,17 +3,21 @@ from bs4 import BeautifulSoup
 import re
 from openpyxl import Workbook
 from openpyxl.compat import range
-import lxml
+from lxml import html 
 
 def get_courses_list():
 
+    try:
+        coursera_xml = requests.get('https://www.coursera.org/sitemap~www~courses.xml')
+    except requests.exceptions.RequestException:
+        coursera_xml = None
 
+    tree = html.fromstring(coursera_xml.content) 
+    courses_list =  tree.xpath('//loc/text()')
+    course_test = ['https://www.coursera.org/learn/astrofizika','https://www.coursera.org/learn/jian-ji']
 
-    courses_list = ['https://www.coursera.org/learn/gamification', 'https://www.coursera.org/learn/missing-data',
-                    'https://www.coursera.org/learn/vital-signs', 'https://www.coursera.org/learn/modern-art-ideas',
-                    'https://www.coursera.org/learn/evolvinguniverse']
-    return courses_list
-
+    return course_test
+    #return courses_list
 
 def get_course_info(course_slug):
 
@@ -22,8 +26,7 @@ def get_course_info(course_slug):
     except requests.exceptions.RequestException:
         page = None
 
-    soup = BeautifulSoup(page.text, 'html.parser')
-
+    soup = BeautifulSoup(page.text.encode('utf-8'), 'html.parser')
     course_title = soup.find('title').get_text().split(' |')[0]
     course_language = soup.find('div', class_='rc-Language').get_text().split(',')[0]
     course_started = soup.find('div', class_='startdate rc-StartDateString caption-text').get_text()
