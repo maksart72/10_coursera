@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 import re
 from openpyxl import Workbook
 from openpyxl.compat import range
-from lxml import html 
+from lxml import html
+import sys
+
 
 def get_courses_list():
 
@@ -12,21 +14,20 @@ def get_courses_list():
     except requests.exceptions.RequestException:
         coursera_xml = None
 
-    tree = html.fromstring(coursera_xml.content) 
+    tree = html.fromstring(coursera_xml.content)
     courses_list =  tree.xpath('//loc/text()')
-    course_test = ['https://www.coursera.org/learn/astrofizika','https://www.coursera.org/learn/jian-ji']
 
-    return course_test
-    #return courses_list
+    return courses_list[:20]
 
 def get_course_info(course_slug):
 
     try:
         page = requests.get(course_slug)
+        page.encoding = 'UTF-8'
     except requests.exceptions.RequestException:
         page = None
 
-    soup = BeautifulSoup(page.text.encode('utf-8'), 'html.parser')
+    soup = BeautifulSoup(page.text, 'html.parser')
     course_title = soup.find('title').get_text().split(' |')[0]
     course_language = soup.find('div', class_='rc-Language').get_text().split(',')[0]
     course_started = soup.find('div', class_='startdate rc-StartDateString caption-text').get_text()
@@ -59,8 +60,6 @@ def output_courses_info_to_xlsx(filepath):
     for course_slug in courses_list:
         courses.append(get_course_info(course_slug))
 
-    print(courses)
-
     wb = Workbook()
     ws = wb.active
     ws['A1'] = 'Title'
@@ -80,20 +79,5 @@ def output_courses_info_to_xlsx(filepath):
 if __name__ == '__main__':
     pass
 
-
 filepath = 'c:/1/coursera.xlsx'
 output_courses_info_to_xlsx(filepath)
-
-"""
-Порядок действий такой:
-
-    Вытащить список курсов из xml-фида Курсеры, хотя бы случайные 20. Для парсинга xml подойдёт, например, lxml.
-    Зайти на страницу курса и вытащить оттуда название, язык, ближайшую дату начала, количество недель и среднюю оценку. Для получения данных хорошо использовать requests, а для парсинга - beautifulsoup4. Искать информацию в документе удобно с помощью Chrome DevTools, вкладки Elements — там можно визуально выбрать нужный элемент на странице и узнать путь к нему внутри документа.
-    Выгрузить эти данные в xlsx-файл, один курс – одна строка. Для работы с эксель-файлами можно использовать openpyxl.
-
-Задача довольно большая и что-то может быть совсем непонятно, не работать, не устанавливаться, быть недокументированным и сырым. Это нормально. Борись с этим.
-
-Полезными могут оказаться:
-
-    HTML и CSS - обзорная статья.
-"""

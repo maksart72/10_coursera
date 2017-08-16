@@ -1,6 +1,6 @@
 # Coursera Dump
 
-[TODO. There will be project description]
+Script takes XML sitemap from Coursera.com
 
 # Project Goals
 
