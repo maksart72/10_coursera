@@ -72,13 +72,12 @@ def output_courses_info_to_xlsx(filepath, courses_list):
 
     for row in range(2, len(courses) + 2):
         for col in range(1, 7):
-            _ = courses_sheet.cell(column=col, row=row, value="{0}".format(
+            courses_sheet.cell(column=col, row=row, value="{0}".format(
                 courses[row - 2][col - 1]))
     try:
         courses_workbook.save(filepath)
     except PermissionError:
         print('Can not write to file!')
-        exit()
 
 if __name__ == '__main__':
 
