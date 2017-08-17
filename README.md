@@ -1,6 +1,6 @@
 # Coursera Dump
 
-Script takes XML sitemap from Coursera.com
+Script takes XML sitemap from Coursera.org and saves into XLSX file information about courses. 
 
 # Project Goals
 
