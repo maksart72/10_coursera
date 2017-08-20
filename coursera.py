@@ -1,3 +1,4 @@
+import sys
 import re
 import requests
 from bs4 import BeautifulSoup
@@ -50,8 +51,8 @@ def get_course_info(course_slug):
     else:
         course_mark = course_mark[0]
 
-    course_info = [course_title, course_language, course_started,
-                   course_commitment, course_mark, course_slug]
+    course_info = (course_title, course_language, course_started,
+                   course_commitment, course_mark, course_slug)
 
     return course_info
 
@@ -80,8 +81,11 @@ def output_courses_info_to_xlsx(filepath, courses_list):
         print('Can not write to file!')
 
 if __name__ == '__main__':
-
-    filepath = 'c:/1/coursera.xlsx'
-    courses_num = 10
-    courses_list = get_courses_list(courses_num)
-    output_courses_info_to_xlsx(filepath, courses_list)
+    try:
+        filepath = sys.argv[1]
+    except IndexError:
+        print('Error: Empty argument, try coursera.py <filename>.xlsx')
+    else:
+        courses_num = 10
+        courses_list = get_courses_list(courses_num)
+        output_courses_info_to_xlsx(filepath, courses_list)
